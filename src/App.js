@@ -1,41 +1,35 @@
-import styled, { createGlobalStyle } from "styled-components";
 import Header from "./components/Header/Header";
-import TodosList from "./TodosList/TodosList";
+import UserModal from "./components/UserModalComponent";
+import TodosList from "./components/TodosList/TodosList";
+import { ChangeThemeButton, GlobalStyle, MainContainer, themeDark, themeLight, Wrapper } from "./GlobalStyle";
+import { ThemeProvider } from "styled-components";
+import { useEffect, useState } from "react";
+import { getThemeFromStorage, setThemeToStorage } from "./utilities/themeStorage";
 
-const GlobalStyle = createGlobalStyle`
-*{
-  border:0;
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  text-decoration: none;
-  color: #000;
-}
-html{
-  font-size: 62.5%;
-  font-family: 'Rubik', sans-serif
-}
-body{
-  background-color: #596275;
-}
-`
-const MainContainer = styled.div`
-width: 600px;
-height: auto;
-margin:  25% auto;
-border: .2rem solid #c44569;
-border-radius: .4rem;
-background-color: #cf6a87;
-`
+
 const App = () => {
+  const [theme, setTheme] = useState(getThemeFromStorage() || setThemeToStorage('light'))
+  const handleTheme = () => {
+    theme === "light" ? setTheme('dark') : setTheme('light')
+  }
+  useEffect(() => {
+    setThemeToStorage(theme)
+  }, [theme])
   return (
     <>
-      <MainContainer>
-        <Header />
-        <TodosList />
-      </MainContainer>
-      <GlobalStyle />
+      <ThemeProvider theme={theme === "light" ? themeLight : themeDark}>
+        <GlobalStyle />
+        <ChangeThemeButton onClick={() => handleTheme()}>
+          {theme === "light" ? "OFF" : "ON"}
+        </ChangeThemeButton>
+        <Wrapper>
+          <MainContainer>
+            <Header />
+            <TodosList />
+            <UserModal />
+          </MainContainer>
+        </Wrapper>
+      </ThemeProvider>
     </>
   );
 }
